@@ -1,0 +1,9 @@
+{
+  "development": {
+    "username": "goku",
+    "password": "KameHameHa2025!",
+    "database": "db_gestion_tarea",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}
