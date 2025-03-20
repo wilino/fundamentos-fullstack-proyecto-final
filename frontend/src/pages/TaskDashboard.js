@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Container, Typography, Button, TextField, Paper, Box, Grid, Card, CardContent, CardActions, IconButton, CircularProgress } from "@mui/material";
 import { Add, Delete, Edit } from "@mui/icons-material";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { fetchTasks, createTask, updateTask, deleteTask } from "../services/taskService"; // 🔥 Importar las funciones del servicio
 
 const TaskDashboard = () => {
   const [tasks, setTasks] = useState([]);
@@ -14,57 +14,37 @@ const TaskDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchTasks();
+    loadTasks();
   }, []);
 
-  const fetchTasks = async () => {
+  const loadTasks = async () => {
     setLoading(true);
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5001/api/tasks", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setTasks(response.data);
-    } catch (error) {
-      console.error("Error al obtener tareas:", error);
-    } finally {
-      setLoading(false);
-    }
+    const tasksData = await fetchTasks();
+    setTasks(tasksData);
+    setLoading(false);
   };
 
   const handleAddOrUpdateTask = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const taskData = { title, description };
+    let success = false;
 
-      if (editingTask) {
-        await axios.put(`http://localhost:5001/api/tasks/${editingTask.id}`, taskData, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      } else {
-        await axios.post("http://localhost:5001/api/tasks", taskData, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      }
+    if (editingTask) {
+      success = await updateTask(editingTask.id, title, description);
+    } else {
+      success = await createTask(title, description);
+    }
 
+    if (success) {
       setTitle("");
       setDescription("");
       setEditingTask(null);
-      fetchTasks();
-    } catch (error) {
-      console.error("Error al guardar tarea:", error);
+      loadTasks();
     }
   };
 
   const handleDeleteTask = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5001/api/tasks/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchTasks();
-    } catch (error) {
-      console.error("Error al eliminar tarea:", error);
+    const success = await deleteTask(id);
+    if (success) {
+      loadTasks();
     }
   };
 
@@ -144,4 +124,3 @@ const TaskDashboard = () => {
 };
 
 export default TaskDashboard;
-

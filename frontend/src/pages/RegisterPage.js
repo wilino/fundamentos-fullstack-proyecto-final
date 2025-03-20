@@ -1,24 +1,21 @@
 import { useState } from "react";
 import { TextField, Button, Container, Typography, Paper, Box } from "@mui/material";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { register } from "../services/auth"; // 🔥 Importar la función de autenticación
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleRegister = async () => {
-    try {
-      await axios.post("http://localhost:5001/api/auth/register", {
-        name,
-        email,
-        password,
-      });
-      navigate("/");
-    } catch (error) {
-      alert("Error al registrar usuario");
+    const result = await register(name, email, password);
+    if (result.success) {
+      navigate("/"); // ✅ Redirigir al login tras el registro exitoso
+    } else {
+      setError(result.message); // ❌ Mostrar error si ocurre un problema
     }
   };
 
@@ -28,6 +25,7 @@ const RegisterPage = () => {
         <Typography variant="h5" gutterBottom>
           Registrarse
         </Typography>
+        {error && <Typography color="error">{error}</Typography>}
         <TextField
           fullWidth
           label="Nombre"

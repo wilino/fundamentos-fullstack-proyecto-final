@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { TextField, Button, Container, Typography, Paper, Box } from "@mui/material";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { login } from "../services/auth"; // 🔥 Importar la función de autenticación
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -10,16 +10,11 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    try {
-      const response = await axios.post("http://localhost:5001/api/auth/login", {
-        email,
-        password,
-      });
-
-      localStorage.setItem("token", response.data.token);
-      navigate("/dashboard"); // 🔄 Ahora se redirige correctamente
-    } catch (error) {
-      setError("Credenciales incorrectas. Intenta nuevamente.");
+    const result = await login(email, password);
+    if (result.success) {
+      navigate("/dashboard"); // 🔄 Redirigir al dashboard si el login es exitoso
+    } else {
+      setError(result.message); // ❌ Mostrar error si las credenciales son incorrectas
     }
   };
 
