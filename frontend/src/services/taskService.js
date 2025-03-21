@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Definir la URL base de la API usando una variable de entorno
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5001/api/tasks";
+const API_URL = process.env.REACT_APP_API_URL+'/api/tasks'  || "http://localhost:5001/api/tasks";
 
 // Obtener el token almacenado
 const getAuthHeaders = () => {
